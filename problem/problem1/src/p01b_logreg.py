@@ -58,6 +58,7 @@ def main(train_path, eval_path, pred_path, plot_path):
     clf.fit(x_train, y_train)
     x_eval, y_eval = util.load_dataset(eval_path, add_intercept=True)
     y_pred = clf.predict(x_eval)
+    y_pred = y_pred > 0.5
     p = np.where(y_eval == y_pred, 1, 0)
     print('成功率为%d/%d' % (np.sum(p), len(y_eval.flatten())))
     np.savetxt(pred_path, y_pred, fmt='%.1lf')
@@ -87,6 +88,7 @@ class LogisticRegression(LinearModel):
         x = np.array(x)
         m, n = x.shape
         y = np.array(y).reshape(m, 1)
+        self.theta = np.zeros((n, 1))
         for _ in range(self.max_iter):
             p = self.g(x@self.theta)
             grad = x.T@(p - y)/m
@@ -110,6 +112,5 @@ class LogisticRegression(LinearModel):
         x = np.array(x)
         m, n = x.shape
         y = self.g(x@self.theta)
-        y = np.where(y > 0.5, 1, 0)
         return y.flatten()
         # *** END CODE HERE ***
